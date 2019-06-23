@@ -23,11 +23,11 @@ async def crawl():
 async def prepare(request):
     name, type = request.query['name'], request.query['type']
     stats = { }
-    for time in records[name][type]:
-        if time[11:13] in stats:
-            stats[time[11:13]] += [records[name][type][time]]
+    for key in records[name][type]:
+        if key[11:13] in stats:
+            stats[key[11:13]] += [records[name][type][key]]
         else:
-            stats[time[11:13]] = [records[name][type][time]]
+            stats[key[11:13]] = [records[name][type][key]]
     for key in stats:
         stats[key] = (lambda x: round(sum(x) / len(x), 2))(stats[key])
     return web.json_response(data=stats)
