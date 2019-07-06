@@ -1,10 +1,10 @@
+import math
 import arrow
 import aiohttp
 import aiocron
 from aiohttp import web
 
 records = { }
-
 session = aiohttp.ClientSession()
 
 @aiocron.crontab('*/15 * * * *')
@@ -21,15 +21,15 @@ async def crawl():
                 records[name] = { 'gym': { now: int(center['gymPeopleNum']) }, 'pool': { now:  int(center['swPeopleNum']) } }
 
 async def prepare(request):
-    name, type = request.query['name'], request.query['type']
+    name, space = request.query['name'], request.query['space']
     stats = { }
-    for key in records[name][type]:
+    for key in records[name][space]:
         if key[11:13] in stats:
-            stats[key[11:13]] += [records[name][type][key]]
+            stats[key[11:13]] += [records[name][space][key]]
         else:
-            stats[key[11:13]] = [records[name][type][key]]
+            stats[key[11:13]] = [records[name][space][key]]
     for key in stats:
-        stats[key] = (lambda x: round(sum(x) / len(x), 2))(stats[key])
+        stats[key] = (lambda x: math.ceil(round(sum(x) / len(x), 2)))(stats[key])
     return web.json_response(data=stats)
 
 app = web.Application()
